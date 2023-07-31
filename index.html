@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResearchedTags - Free Tag Generator for YouTube</title>
+  <!-- Bootstrap CSS link -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <!-- Bootstrap header -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">ResearchedTags</a>
+  </nav>
+
+  <!-- Main content -->
+  <div class="container mt-4">
+    <!-- Search box -->
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="text" id="searchTerm" class="form-control" placeholder="Enter your search term..." onkeyup="handleSearch(event)">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button" onclick="searchTags()">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Copy Tags button -->
+    <div class="row justify-content-center mt-4">
+      <div class="col-md-6">
+        <button class="btn btn-success btn-block" onclick="copyTags()">Copy Tags</button>
+      </div>
+    </div>
+  </div>
+    <!-- Display tags here -->
+    <div class="row mt-4" id="tagsContainer">
+    </div>
+  <!-- Bootstrap footer -->
+  <footer class="footer bg-light mt-4">
+    <div class="container text-center">
+      <span class="text-muted">&copy;  <a href="https://codexdindia.blogspot.com/tools" target="_blank" rel="dofollow">CXDI</a></span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Custom JavaScript -->
+  <script>
+    // Function to handle the search and API call on Enter key press
+    function handleSearch(event) {
+      if (event.keyCode === 13) {
+        searchTags();
+      }
+    }
+
+    // Function to handle the search and API call
+    function searchTags() {
+      const searchTerm = document.getElementById('searchTerm').value.trim();
+
+      // Make API call only if search term is not empty
+      if (searchTerm !== '') {
+        // Replace spaces in search term with '+' as required by the API
+        const formattedSearchTerm = searchTerm.replace(/\s+/g, '+');
+
+        // API URL with the formatted search term
+        const apiUrl = `https://wholly-api.sh20raj.repl.co/get/website-data.php?get_html=https://www.rapidtags.io/api/generator?query=${formattedSearchTerm}&type=YouTube`;
+
+        // Fetch data from the API
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            // Display the tags on the webpage
+            displayTags(data.tags);
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
+      }
+    }
+
+    // Function to display tags on the webpage
+    function displayTags(tags) {
+      const tagsContainer = document.getElementById('tagsContainer');
+      tagsContainer.innerHTML = ''; // Clear previous tags
+
+      // Create and append tag elements
+      for (const tag of tags) {
+        const tagElement = document.createElement('div');
+        tagElement.className = 'col-md-3 mb-2';
+        tagElement.innerHTML = `<div class="card card-body border-0">${tag}</div>`;
+        tagsContainer.appendChild(tagElement);
+      }
+    }
+
+    // Function to copy tags as comma-separated values
+    function copyTags() {
+      const tags = document.querySelectorAll('#tagsContainer .card-body');
+      const tagValues = Array.from(tags).map(tag => tag.textContent.trim());
+      const tagsString = tagValues.join(', ');
+
+      // Create a temporary input element to copy tags to clipboard
+      const tempInput = document.createElement('input');
+      tempInput.value = tagsString;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      // Show copied notification (you can customize this part)
+      alert('Tags copied to clipboard!');
+    }
+  </script>
+</body>
+</html>
